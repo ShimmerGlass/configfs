@@ -1,4 +1,4 @@
-package main
+package configfs
 
 import (
 	"bytes"
@@ -26,17 +26,17 @@ func (g *Generator) Gen(project string, in []byte) ([]byte, error) {
 
 	out := in
 	for _, k := range keys {
-		env, err := g.env(k)
+		env, err := g.env(k.Name)
 		if err != nil {
 			return nil, err
 		}
 
-		v, err := g.provider.Value(k, project, env)
+		v, err := g.provider.Value(k.Name, project, env)
 		if err != nil {
 			return nil, err
 		}
 
-		out = bytes.Replace(out, []byte(k), []byte(v), 1)
+		out = bytes.Replace(out, []byte(k.Name), []byte(v), 1)
 	}
 
 	return out, nil

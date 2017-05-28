@@ -13,7 +13,7 @@ Make config management easier across micro services while complying with product
 `configfs`'s config lives at `~/.configfs/.config`. Only one parameter is required: the env.
 
 ```sh
-echo 'env = "local"' > ~/.configfs/.config
+configfs set-env local
 ```
 
 ### Example
@@ -37,7 +37,7 @@ LISTEN_ADDR = "127.0.0.1"
 
 ```sh
 $ touch ~/my-project/config.json
-$ configfs -source ~/my-project/config.json.tmpl -dest ~/my-project/config.json
+$ configfs mount ~/my-project/config.json.tmpl ~/my-project/config.json
 ```
 
 ```json

@@ -1,4 +1,4 @@
-package main
+package configfs
 
 import (
 	"fmt"
@@ -15,13 +15,13 @@ func NewTomlProvider(root string) *TomlProvider {
 	return &TomlProvider{root: root}
 }
 
-func (p *TomlProvider) List() ([]string, error) {
+func (p *TomlProvider) List() ([]ConfigEntry, error) {
 	files, err := filepath.Glob(filepath.Join(p.root, "/*.toml"))
 	if err != nil {
 		return nil, err
 	}
 
-	var res []string
+	var res []ConfigEntry
 
 	for _, f := range files {
 		entries := map[string]interface{}{}
@@ -33,11 +33,16 @@ func (p *TomlProvider) List() ([]string, error) {
 		for k, v := range entries {
 			pk, ok := v.(map[string]interface{})
 			if ok {
-				for k := range pk {
-					res = append(res, k)
+				for sk := range pk {
+					res = append(res, ConfigEntry{
+						Name:    sk,
+						Project: k,
+					})
 				}
 			} else {
-				res = append(res, k)
+				res = append(res, ConfigEntry{
+					Name: k,
+				})
 			}
 		}
 	}

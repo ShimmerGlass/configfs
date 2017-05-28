@@ -1,4 +1,4 @@
-package main
+package configfs
 
 import (
 	"regexp"
