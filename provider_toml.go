@@ -30,8 +30,15 @@ func (p *TomlProvider) List() ([]string, error) {
 			return nil, err
 		}
 
-		for k := range entries {
-			res = append(res, k)
+		for k, v := range entries {
+			pk, ok := v.(map[string]interface{})
+			if ok {
+				for k := range pk {
+					res = append(res, k)
+				}
+			} else {
+				res = append(res, k)
+			}
 		}
 	}
 
@@ -49,13 +56,17 @@ func (p *TomlProvider) Value(k, project, env string) (string, error) {
 	if ok {
 		projectConfig, ok := projectConfig.(map[string]interface{})
 		if ok {
-			v, ok := projectConfig[k].(string)
+			v, ok := projectConfig[k]
 			if ok {
-				return v, nil
+				return p.v(v), nil
 			}
 		}
 	}
 
-	v, _ := entries[k].(string)
-	return v, nil
+	v, _ := entries[k]
+	return p.v(v), nil
+}
+
+func (p *TomlProvider) v(v interface{}) string {
+	return fmt.Sprintf("%v", v)
 }
