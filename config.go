@@ -7,9 +7,8 @@ import (
 type ConfigFn func() (Config, error)
 
 type Config struct {
-	DefaultEnv  string            `toml:"default_env"`
+	Env         string            `toml:"env"`
 	EnvPatterns map[string]string `toml:"env_patterns"`
-	Localized   []string          `toml:"localized"`
 }
 
 type ConfigManager struct {

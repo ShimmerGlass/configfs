@@ -33,5 +33,5 @@ func (m *Env) Env(k string) (string, error) {
 		}
 	}
 
-	return config.DefaultEnv, nil
+	return config.Env, nil
 }

@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/BurntSushi/toml"
 	"path/filepath"
+
+	"github.com/BurntSushi/toml"
 )
 
 type TomlProvider struct {
