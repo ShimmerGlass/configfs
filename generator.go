@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 )
@@ -19,22 +20,22 @@ func NewGenerator(provider Provider, env EnvFn, configFn ConfigFn) *Generator {
 	}
 }
 
-func (g *Generator) Gen(project, in string) (string, error) {
+func (g *Generator) Gen(project string, in []byte) ([]byte, error) {
 	keys, err := g.provider.List()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	config, err := g.configFn()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	out := in
 	for _, k := range keys {
 		env, err := g.env(k)
 		if err != nil {
-			return "", err
+			return nil, err
 		}
 
 		outK := k
@@ -47,10 +48,10 @@ func (g *Generator) Gen(project, in string) (string, error) {
 
 		v, err := g.provider.Value(k, env)
 		if err != nil {
-			return "", err
+			return nil, err
 		}
 
-		out = strings.Replace(out, outK, v, 1)
+		out = bytes.Replace(out, []byte(outK), []byte(v), 1)
 	}
 
 	return out, nil

@@ -38,12 +38,12 @@ func main() {
 			return nil, err
 		}
 
-		out, err := generator.Gen(*project, string(tmpl))
+		out, err := generator.Gen(*project, tmpl)
 		if err != nil {
 			return nil, err
 		}
 
-		return []byte(out), err
+		return out, err
 	})
 
 	sigChan := make(chan os.Signal, 1)
