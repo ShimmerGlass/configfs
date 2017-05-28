@@ -21,7 +21,7 @@ func (p *TomlProvider) List() ([]ConfigEntry, error) {
 		return nil, err
 	}
 
-	var res []ConfigEntry
+	rentries := map[string]ConfigEntry{}
 
 	for _, f := range files {
 		entries := map[string]interface{}{}
@@ -34,17 +34,23 @@ func (p *TomlProvider) List() ([]ConfigEntry, error) {
 			pk, ok := v.(map[string]interface{})
 			if ok {
 				for sk := range pk {
-					res = append(res, ConfigEntry{
+					rentries[fmt.Sprintf("%s-%s", sk, k)] = ConfigEntry{
 						Name:    sk,
 						Project: k,
-					})
+					}
 				}
 			} else {
-				res = append(res, ConfigEntry{
+				rentries[k] = ConfigEntry{
 					Name: k,
-				})
+				}
 			}
 		}
+	}
+
+	var res []ConfigEntry
+
+	for _, e := range rentries {
+		res = append(res, e)
 	}
 
 	return res, nil
