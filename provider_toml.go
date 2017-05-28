@@ -37,11 +37,22 @@ func (p *TomlProvider) List() ([]string, error) {
 	return res, nil
 }
 
-func (p *TomlProvider) Value(k, env string) (string, error) {
+func (p *TomlProvider) Value(k, project, env string) (string, error) {
 	entries := map[string]interface{}{}
 	_, err := toml.DecodeFile(filepath.Join(p.root, fmt.Sprintf("%s.toml", env)), &entries)
 	if err != nil {
 		return "", err
+	}
+
+	projectConfig, ok := entries[project]
+	if ok {
+		projectConfig, ok := projectConfig.(map[string]interface{})
+		if ok {
+			v, ok := projectConfig[k].(string)
+			if ok {
+				return v, nil
+			}
+		}
 	}
 
 	v, _ := entries[k].(string)

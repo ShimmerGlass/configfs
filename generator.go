@@ -9,24 +9,17 @@ import (
 type Generator struct {
 	provider Provider
 	env      EnvFn
-	configFn ConfigFn
 }
 
-func NewGenerator(provider Provider, env EnvFn, configFn ConfigFn) *Generator {
+func NewGenerator(provider Provider, env EnvFn) *Generator {
 	return &Generator{
 		provider: provider,
 		env:      env,
-		configFn: configFn,
 	}
 }
 
 func (g *Generator) Gen(project string, in []byte) ([]byte, error) {
 	keys, err := g.provider.List()
-	if err != nil {
-		return nil, err
-	}
-
-	config, err := g.configFn()
 	if err != nil {
 		return nil, err
 	}
@@ -38,20 +31,12 @@ func (g *Generator) Gen(project string, in []byte) ([]byte, error) {
 			return nil, err
 		}
 
-		outK := k
-		for _, l := range config.Localized {
-			if g.toLocalized(l, project) == k {
-				outK = l
-				break
-			}
-		}
-
-		v, err := g.provider.Value(k, env)
+		v, err := g.provider.Value(k, project, env)
 		if err != nil {
 			return nil, err
 		}
 
-		out = bytes.Replace(out, []byte(outK), []byte(v), 1)
+		out = bytes.Replace(out, []byte(k), []byte(v), 1)
 	}
 
 	return out, nil

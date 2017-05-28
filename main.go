@@ -30,7 +30,7 @@ func main() {
 	config := NewConfigManager(filepath.Join(path, ".config")).Load
 	configProvider := NewTomlProvider(filepath.Join(usr.HomeDir, ".configfs"))
 	envManager := NewEnv(config).Env
-	generator := NewGenerator(configProvider, envManager, config)
+	generator := NewGenerator(configProvider, envManager)
 
 	closeFs, errs := MountFS(*dest, func() ([]byte, error) {
 		tmpl, err := ioutil.ReadFile(*source)
