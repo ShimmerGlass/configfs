@@ -22,6 +22,7 @@ func init() {
 
 var listCmd = &cobra.Command{
 	Use: "list",
+	Short: "List available variables",
 	Run: func(cmd *cobra.Command, args []string) {
 		cfgDir, err := cmd.Flags().GetString("cfg")
 		if err != nil {
@@ -58,9 +59,14 @@ var listCmd = &cobra.Command{
 				log.Fatal(err)
 			}
 
+			project := entry.Project
+			if project == "" {
+				project = "<global>"
+			}
+
 			table.Append([]string{
 				entry.Name,
-				entry.Project,
+				project,
 				env,
 				value,
 			})

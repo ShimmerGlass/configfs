@@ -16,7 +16,8 @@ func init() {
 }
 
 var setEnvCmd = &cobra.Command{
-	Use: "set-env",
+	Use:   "set-env",
+	Short: "Modify the default environment",
 	Run: func(cmd *cobra.Command, args []string) {
 		cfgDir, err := cmd.Flags().GetString("cfg")
 		if err != nil {

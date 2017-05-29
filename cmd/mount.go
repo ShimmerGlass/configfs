@@ -18,7 +18,8 @@ func init() {
 }
 
 var mountCmd = &cobra.Command{
-	Use: "mount",
+	Use:   "mount",
+	Short: "Mount config file at given location",
 	Run: func(cmd *cobra.Command, args []string) {
 		cfgDir, err := cmd.Flags().GetString("cfg")
 		if err != nil {

@@ -9,8 +9,5 @@ func init() {
 }
 
 var RootCmd = &cobra.Command{
-	Use: "",
-	Run: func(cmd *cobra.Command, args []string) {
-		cmd.Usage()
-	},
+	Use: "configfs",
 }
