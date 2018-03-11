@@ -1,0 +1,97 @@
+<html ng-app="cfgcfg">
+
+<head>
+	<link rel="stylesheet" href="styles.css">
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+	<script src="script.js"></script>
+</head>
+
+<body ng-controller="MainCtrl as mainctrl">
+	<div class="topbar">
+		<a href="#" ng-click="page = 'projects'">Projects</a>
+		<a href="#" ng-click="page = 'envs'">Envs</a>
+	</div>
+	<div ng-show="page == 'projects'" ng-controller="ProjectsCtrl as ctrl">
+		<div class="leftbar">
+			<input type="text" ng-model="projectSearch" class="search" autofocus placeholder="Search" ng-keypress="ctrl.projectSearchPress($event)"
+			/>
+			<ul>
+				<li ng-repeat="(k, v) in filteredProjects" ng-class="{'active': currentProject == k}">
+					<a href="#" ng-click="ctrl.setCurrentProject(v)">{{v.name}}</a>
+				</li>
+			</ul>
+		</div>
+		<div class="content">
+			<h2>
+				<div class="var-search-container">
+					<input type="text" ng-model="varSearch" class="var-search search" placeholder="Search vars..." ng-keydown="ctrl.varSearchPress($event)"
+					 ng-blur="vsShow = false">
+
+					<ul class="envs">
+						<li ng-repeat="(k, v) in envs" ng-class="{active: vsIndex == $index}" ng-show="vsShow">
+							{{k}}
+						</li>
+					</ul>
+				</div>
+				{{currentProject.name}}
+			</h2>
+
+			<div ng-repeat="(varName, var) in filteredVars" class="var {{ctrl.value(varName, var) && 'ok' || 'nok'}}">
+				<div class="value">{{ctrl.value(varName, var)}}</div>
+				<div class="name">{{varName}}</div>
+				<span ng-repeat="(k, v) in envs">
+					<label>
+						<input ng-click="var.env = k; ctrl.updateProject(currentProject)" ng-checked="var.env == k" type="checkbox"> {{k}}
+					</label>
+				</span>
+				<label>
+					<input ng-checked="!var.env" type="checkbox" ng-click="var.env = ''; ctrl.updateProject(currentProject)">
+					<input type="text" ng-model="var.value" placeholder="Custom" ng-change="var.env = ''; ctrl.updateProject(currentProject)"
+					/>
+				</label>
+
+				<select ng-show="var.value" ng-change="ctrl.saveToEnv(saveToEnvModel, varName, var.value)" ng-model="saveToEnvModel">
+					<option value="">Save to env...</option>
+					<option ng-repeat="(k, v) in envs" value="{{k}}">{{k}}</option>
+				</select>
+			</div>
+		</div>
+	</div>
+	<div ng-show="page == 'envs'" ng-controller="EnvsCtrl as ctrl">
+		<div class="leftbar">
+			<ul>
+				<li ng-repeat="(k, v) in envs" ng-click="ctrl.currentEnv = k">
+					<a href="#">{{k}}</a>
+				</li>
+			</ul>
+
+			<input placeholder="New" ng-model="newEnv">
+			<button ng-click="ctrl.saveNewEnv()">Ok</button>
+		</div>
+
+		<div class="content">
+			<h2>
+				{{ctrl.currentEnv}}
+				<input type="text" ng-model="envVarSearch" placeholder="Search" />
+			</h2>
+
+			<div ng-repeat="(k, v) in envs[ctrl.currentEnv]" class="var">
+				<div class="value">
+					<input type="text" ng-model="envs[ctrl.currentEnv][k]" ng-change="mainctrl.updateEnvs()" />
+					<button ng-click="ctrl.delete(ctrl.currentEnv, k)">X</button>
+				</div>
+				<div class="name">{{k}}</div>
+			</div>
+			<div class="var">
+				New:
+				<input type="text" ng-model="newKey" />
+				<input type="text" ng-model="newValue" />
+				<button ng-click="ctrl.saveNewKey()">Ok</button>
+			</div>
+		</div>
+
+	</div>
+</body>
+
+</html>

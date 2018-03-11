@@ -1,12 +1,6 @@
 package cmd
 
 import (
-	"io/ioutil"
-	"log"
-	"os"
-	"path/filepath"
-
-	"github.com/aestek/configfs/pkg"
 	"github.com/spf13/cobra"
 )
 
@@ -19,7 +13,7 @@ var genCmd = &cobra.Command{
 	Use:   "gen",
 	Short: "Generate a config file without mounting it",
 	Run: func(cmd *cobra.Command, args []string) {
-		cfgDir, err := cmd.Flags().GetString("cfg")
+		/*cfgDir, err := cmd.Flags().GetString("cfg")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -49,6 +43,6 @@ var genCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		os.Stdout.Write(out)
+		os.Stdout.Write(out)*/
 	},
 }
