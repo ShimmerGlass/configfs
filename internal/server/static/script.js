@@ -93,153 +93,128 @@ angular.module('cfgcfg', [])
             $scope.$parent.mainctrl.updateEnvs();
           };
         })
-    .controller(
-        'ProjectsCtrl',
-        function($http, $scope, $filter) {
-          var ctrl = this;
+    .controller('ProjectsCtrl', function($http, $scope, $filter) {
+      var ctrl = this;
 
-          $scope.projects = [];
-          $scope.currentProject = {};
-          $http.get("http://localhost:3005/projects")
-              .then(
-                  function(response) {
-                    $scope.projects = response.data;
-                    if ($scope.projects) {
-                      $scope.currentProject = $scope.projects[0];
-                    }
-                  },
-                  function errorCallback(response) { console.log(response) });
+      $scope.projects = [];
+      $scope.currentProject = {};
+      $http.get("http://localhost:3005/projects")
+          .then(
+              function(response) {
+                $scope.projects = response.data;
+                if ($scope.projects) {
+                  $scope.currentProject = $scope.projects[0];
+                }
+              },
+              function errorCallback(response) { console.log(response) });
 
 
-          ctrl.saveToEnv = function(env, k, v) {
-            $scope.$parent.envs[env][k] = v;
-            $scope.currentProject.vars[k].value = "";
-            $scope.currentProject.vars[k].env = env;
-            ctrl.updateProject($scope.currentProject);
-            $scope.$parent.mainctrl.updateEnvs();
-          };
+      ctrl.saveToEnv = function(env, k, v) {
+        $scope.$parent.envs[env][k] = v;
+        $scope.currentProject.vars[k].value = "";
+        $scope.currentProject.vars[k].env = env;
+        ctrl.updateProject($scope.currentProject);
+        $scope.$parent.mainctrl.updateEnvs();
+      };
 
-          ctrl.projectSearchPress = function(ev) {
-            if (ev.keyCode == 13) {
-              if ($scope.filteredProjects.length) {
-                ctrl.setCurrentProject($scope.filteredProjects[0]);
-                $scope.projectSearch = '';
-                $(".var-search")[0].focus();
-              }
-            }
-          };
-
-          ctrl.setCurrentProject = function(p) {
-            $scope.currentProject = p;
-            $scope.varSearch = '';
-          };
-
-          ctrl.value = function(k, v) {
-            if (!v) {
-              return "";
-            }
-            if (v.env) {
-              return ($scope.$parent.envs[v.env] || {})[k] || "";
-            }
-
-            return v.value || "";
-          };
-
-          ctrl.updateProject = function(project) {
-            $http.post("http://localhost:3005/projects", project)
-                .then(
-                    function(response) { $scope.projects = response.data },
-                    function errorCallback(response) { console.log(response) });
-          };
-
-          $scope.$watch('varSearch', buildFilteredVars);
-          $scope.$watch('projects', buildFilteredVars);
-          $scope.$watch('currentProject', buildFilteredVars, true);
-
-          function buildFilteredVars() {
-            if (!$scope.currentProject) {
-              return;
-            }
-            if (!$scope.varSearch) {
-              $scope.filteredVars = $scope.currentProject.vars;
-              return;
-            }
-            var vars = {};
-            for (var i in $scope.currentProject.vars) {
-              if (fuzzysearch($scope.varSearch, i)) {
-                vars[i] = $scope.currentProject.vars[i];
-              }
-            }
-            $scope.filteredVars = vars;
+      ctrl.projectSearchPress = function(ev) {
+        if (ev.keyCode == 13) {
+          if ($scope.filteredProjects.length) {
+            ctrl.setCurrentProject($scope.filteredProjects[0]);
+            $scope.projectSearch = '';
+            $(".var-search")[0].focus();
           }
+        }
+      };
 
-          $scope.$watch('projectSearch', buildFilteredProjects);
-          $scope.$watch('projects', buildFilteredProjects);
+      ctrl.setCurrentProject = function(p) {
+        $scope.currentProject = p;
+        $scope.varSearch = '';
+      };
 
-          ctrl.varSearchPress = function(ev) {
-            if (ev.keyCode == 40 && !$scope.vsShow) {
-              var envs = Object.keys($scope.$parent.envs);
-              if (!envs.length) {
-                return;
-              }
-              $scope.vsShow = true;
-              $scope.vsIndex = 0;
-            } else if (ev.keyCode == 40) {
-              $scope.vsIndex = ($scope.vsIndex + 1) %
-                  Object.keys($scope.$parent.envs).length;
-            } else if (ev.keyCode == 38) {
-              ev.preventDefault();
-              if ($scope.vsIndex == 0) {
-                $scope.vsShow = false;
-                return;
-              }
-              $scope.vsIndex--;
-            } else if (ev.keyCode == 13 && $scope.vsShow) {
-              for (var i in $scope.filteredVars) {
-                $scope.filteredVars[i].env =
-                    Object.keys($scope.$parent.envs)[$scope.vsIndex];
-              }
-              ctrl.updateProject($scope.currentProject);
-            }
-          };
+      ctrl.value = function(k, v) {
+        if (!v) {
+          return "";
+        }
+        if (v.env) {
+          return ($scope.$parent.envs[v.env] || {})[k] || "";
+        }
 
-          function buildFilteredProjects() {
-            if (!$scope.projects) {
-              return;
-            }
-            if (!$scope.projectSearch) {
-              $scope.filteredProjects = $scope.projects;
-              return;
-            }
-            var projects = [];
-            for (var i in $scope.projects) {
-              if (fuzzysearch($scope.projectSearch, $scope.projects[i].name)) {
-                projects.push($scope.projects[i]);
-              }
-            }
-            $scope.filteredProjects = projects;
+        return v.value || "";
+      };
+
+      ctrl.updateProject = function(project) {
+        $http.post("http://localhost:3005/projects", project)
+            .then(
+                function(response) { $scope.projects = response.data },
+                function errorCallback(response) { console.log(response) });
+      };
+
+      $scope.$watch('varSearch', buildFilteredVars);
+      $scope.$watch('projects', buildFilteredVars);
+      $scope.$watch('currentProject', buildFilteredVars, true);
+
+      function buildFilteredVars() {
+        if (!$scope.currentProject) {
+          return;
+        }
+        if (!$scope.varSearch) {
+          $scope.filteredVars = $scope.currentProject.vars;
+          return;
+        }
+        var vars = {};
+        for (var i in $scope.currentProject.vars) {
+          if (fuzzysearch($scope.varSearch, i)) {
+            vars[i] = $scope.currentProject.vars[i];
           }
-        })
-    .directive('focusMe', [
-      '$timeout', '$parse',
-      function($timeout, $parse) {
-        return {
-          link: function(scope, element, attrs) {
-            console.log("link");
-            var model = $parse(attrs.focusMe);
-            scope.$watch(model, function(value) {
-              console.log('value=', value);
-              if (value === true) {
-                $timeout(function() { element[0].focus(); });
-              }
-            });
-            // to address @blesh's comment, set attribute value to 'false'
-            // on blur event:
-            element.bind('blur', function() {
-              console.log('blur');
-              // scope.$apply(model.assign(scope, false));
-            });
-          }
-        };
+        }
+        $scope.filteredVars = vars;
       }
-    ]);
+
+      $scope.$watch('projectSearch', buildFilteredProjects);
+      $scope.$watch('projects', buildFilteredProjects);
+
+      ctrl.varSearchPress = function(ev) {
+        if (ev.keyCode == 40 && !$scope.vsShow) {
+          var envs = Object.keys($scope.$parent.envs);
+          if (!envs.length) {
+            return;
+          }
+          $scope.vsShow = true;
+          $scope.vsIndex = 0;
+        } else if (ev.keyCode == 40) {
+          $scope.vsIndex =
+              ($scope.vsIndex + 1) % Object.keys($scope.$parent.envs).length;
+        } else if (ev.keyCode == 38) {
+          ev.preventDefault();
+          if ($scope.vsIndex == 0) {
+            $scope.vsShow = false;
+            return;
+          }
+          $scope.vsIndex--;
+        } else if (ev.keyCode == 13 && $scope.vsShow) {
+          for (var i in $scope.filteredVars) {
+            $scope.filteredVars[i].env =
+                Object.keys($scope.$parent.envs)[$scope.vsIndex];
+          }
+          ctrl.updateProject($scope.currentProject);
+        }
+      };
+
+      function buildFilteredProjects() {
+        if (!$scope.projects) {
+          return;
+        }
+        if (!$scope.projectSearch) {
+          $scope.filteredProjects = $scope.projects;
+          return;
+        }
+        var projects = [];
+        for (var i in $scope.projects) {
+          if (fuzzysearch($scope.projectSearch, $scope.projects[i].name)) {
+            projects.push($scope.projects[i]);
+          }
+        }
+        $scope.filteredProjects = projects;
+      }
+    });

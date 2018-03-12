@@ -42,7 +42,7 @@
 				<div class="name">{{varName}}</div>
 				<span ng-repeat="(k, v) in envs">
 					<label>
-						<input ng-click="var.env = k; ctrl.updateProject(currentProject)" ng-checked="var.env == k" type="checkbox"> {{k}}
+						<input ng-click="var.env = k; ctrl.updateProject(currentProject)" ng-checked="var.env == k" type="checkbox" ng-disabled="!v[varName]"> {{k}}
 					</label>
 				</span>
 				<label>
