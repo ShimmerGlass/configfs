@@ -30,7 +30,7 @@ angular.module('cfgcfg', [])
           $scope.page = "projects";
 
           ctrl.updateEnvs = function() {
-            $http.post("http://localhost:3005/envs", $scope.envs)
+            $http.post("/envs", $scope.envs)
                 .then(
                     function(response) { $scope.envs = response.data; },
                     function errorCallback(response) { console.log(response) });
@@ -56,16 +56,15 @@ angular.module('cfgcfg', [])
 
           $scope.$parent.envs = {};
           $scope.currentEnv = "local";
-          $http.get("http://localhost:3005/envs")
-              .then(
-                  function(response) {
-                    $scope.$parent.envs = response.data;
-                    for (var i in $scope.$parent.envs) {
-                      ctrl.currentEnv = i;
-                      break;
-                    }
-                  },
-                  function errorCallback(response) { console.log(response) });
+          $http.get("/envs").then(
+              function(response) {
+                $scope.$parent.envs = response.data;
+                for (var i in $scope.$parent.envs) {
+                  ctrl.currentEnv = i;
+                  break;
+                }
+              },
+              function errorCallback(response) { console.log(response) });
 
           ctrl.saveNewEnv = function() {
             $scope.$parent.envs[$scope.newEnv] = {};
@@ -98,7 +97,7 @@ angular.module('cfgcfg', [])
 
       $scope.projects = [];
       $scope.currentProject = {};
-      $http.get("http://localhost:3005/projects")
+      $http.get("/projects")
           .then(
               function(response) {
                 $scope.projects = response.data;
@@ -144,7 +143,7 @@ angular.module('cfgcfg', [])
       };
 
       ctrl.updateProject = function(project) {
-        $http.post("http://localhost:3005/projects", project)
+        $http.post("/projects", project)
             .then(
                 function(response) { $scope.projects = response.data },
                 function errorCallback(response) { console.log(response) });
