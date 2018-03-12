@@ -9,14 +9,15 @@ body, html {
 
 .topbar {
 	height: 50px;
-	background: #bbb;
+	background: #a9b7ce;
 }
 
 .topbar a {
 	display: inline-block;
-	padding: 0 10px;
+	padding: 0 20px;
 	height: 50px;
 	line-height: 50px;
+	color: #242b36;
 }
 
 .leftbar {

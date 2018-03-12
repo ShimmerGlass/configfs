@@ -7,14 +7,14 @@
 	<script src="script.js"></script>
 </head>
 
-<body ng-controller="MainCtrl as mainctrl">
+<body ng-controller="MainCtrl as mainctrl" ng-keypress="mainctrl.keypress($event)">
 	<div class="topbar">
 		<a href="#" ng-click="page = 'projects'">Projects</a>
 		<a href="#" ng-click="page = 'envs'">Envs</a>
 	</div>
 	<div ng-show="page == 'projects'" ng-controller="ProjectsCtrl as ctrl">
 		<div class="leftbar">
-			<input type="text" ng-model="projectSearch" class="search" autofocus placeholder="Search" ng-keypress="ctrl.projectSearchPress($event)"
+			<input type="text" ng-model="projectSearch" class="project-search search" autofocus placeholder="Search" ng-keypress="ctrl.projectSearchPress($event)"
 			/>
 			<ul>
 				<li ng-repeat="(k, v) in filteredProjects" ng-class="{'active': currentProject == k}">

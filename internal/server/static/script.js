@@ -35,6 +35,19 @@ angular.module('cfgcfg', [])
                     function(response) { $scope.envs = response.data; },
                     function errorCallback(response) { console.log(response) });
           };
+
+          ctrl.keypress = function(ev) {
+            if ($('input:focus').length) {
+              return;
+            }
+            if (ev.keyCode == 115) {
+              $(".var-search").focus();
+              ev.preventDefault();
+            } else if (ev.keyCode == 112) {
+              $(".project-search").focus();
+              ev.preventDefault();
+            }
+          };
         })
     .controller(
         'EnvsCtrl',
