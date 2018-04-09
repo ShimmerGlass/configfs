@@ -27,13 +27,17 @@ angular.module('cfgcfg', [])
         function($http, $scope) {
           var ctrl = this;
 
-          $scope.page = "projects";
+          $scope.page = 'projects';
 
           ctrl.updateEnvs = function() {
-            $http.post("/envs", $scope.envs)
+            $http.post('/envs', $scope.envs)
                 .then(
-                    function(response) { $scope.envs = response.data; },
-                    function errorCallback(response) { console.log(response) });
+                    function(response) {
+                      $scope.envs = response.data;
+                    },
+                    function errorCallback(response) {
+                      console.log(response)
+                    });
           };
 
           ctrl.keypress = function(ev) {
@@ -41,10 +45,10 @@ angular.module('cfgcfg', [])
               return;
             }
             if (ev.keyCode == 115) {
-              $(".var-search").focus();
+              $('.var-search').focus();
               ev.preventDefault();
             } else if (ev.keyCode == 112) {
-              $(".project-search").focus();
+              $('.project-search').focus();
               ev.preventDefault();
             }
           };
@@ -55,8 +59,8 @@ angular.module('cfgcfg', [])
           var ctrl = this;
 
           $scope.$parent.envs = {};
-          $scope.currentEnv = "local";
-          $http.get("/envs").then(
+          $scope.currentEnv = 'local';
+          $http.get('/envs').then(
               function(response) {
                 $scope.$parent.envs = response.data;
                 for (var i in $scope.$parent.envs) {
@@ -64,12 +68,14 @@ angular.module('cfgcfg', [])
                   break;
                 }
               },
-              function errorCallback(response) { console.log(response) });
+              function errorCallback(response) {
+                console.log(response)
+              });
 
           ctrl.saveNewEnv = function() {
             $scope.$parent.envs[$scope.newEnv] = {};
             ctrl.currentEnv = $scope.newEnv;
-            $scope.newEnv = "";
+            $scope.newEnv = '';
             $scope.$parent.mainctrl.updateEnvs();
           };
 
@@ -83,7 +89,7 @@ angular.module('cfgcfg', [])
 
             $scope.$parent.envs[$scope.currentEnv][$scope.newKey] =
                 $scope.newValue;
-            $scope.newKey = $scope.newValue = "";
+            $scope.newKey = $scope.newValue = '';
             $scope.$parent.mainctrl.updateEnvs();
           };
 
@@ -97,7 +103,7 @@ angular.module('cfgcfg', [])
 
       $scope.projects = [];
       $scope.currentProject = {};
-      $http.get("/projects")
+      $http.get('/projects')
           .then(
               function(response) {
                 $scope.projects = response.data;
@@ -105,12 +111,14 @@ angular.module('cfgcfg', [])
                   $scope.currentProject = $scope.projects[0];
                 }
               },
-              function errorCallback(response) { console.log(response) });
+              function errorCallback(response) {
+                console.log(response)
+              });
 
 
       ctrl.saveToEnv = function(env, k, v) {
         $scope.$parent.envs[env][k] = v;
-        $scope.currentProject.vars[k].value = "";
+        $scope.currentProject.vars[k].value = '';
         $scope.currentProject.vars[k].env = env;
         ctrl.updateProject($scope.currentProject);
         $scope.$parent.mainctrl.updateEnvs();
@@ -121,7 +129,7 @@ angular.module('cfgcfg', [])
           if ($scope.filteredProjects.length) {
             ctrl.setCurrentProject($scope.filteredProjects[0]);
             $scope.projectSearch = '';
-            $(".var-search")[0].focus();
+            $('.var-search')[0].focus();
           }
         }
       };
@@ -133,20 +141,24 @@ angular.module('cfgcfg', [])
 
       ctrl.value = function(k, v) {
         if (!v) {
-          return "";
+          return '';
         }
         if (v.env) {
-          return ($scope.$parent.envs[v.env] || {})[k] || "";
+          return ($scope.$parent.envs[v.env] || {})[k] || '';
         }
 
-        return v.value || "";
+        return v.value || '';
       };
 
       ctrl.updateProject = function(project) {
-        $http.post("/projects", project)
+        $http.post('/projects', project)
             .then(
-                function(response) { $scope.projects = response.data },
-                function errorCallback(response) { console.log(response) });
+                function(response) {
+                  $scope.projects = response.data
+                },
+                function errorCallback(response) {
+                  console.log(response)
+                });
       };
 
       $scope.$watch('varSearch', buildFilteredVars);
@@ -204,13 +216,15 @@ angular.module('cfgcfg', [])
         if (!$scope.projects) {
           return;
         }
-        if (!$scope.projectSearch) {
-          $scope.filteredProjects = $scope.projects;
-          return;
-        }
+
         var projects = [];
         for (var i in $scope.projects) {
-          if (fuzzysearch($scope.projectSearch, $scope.projects[i].name)) {
+          if (!$scope.projects[i].vars ||
+              !Object.keys($scope.projects[i].vars).length) {
+            continue;
+          }
+          if (!$scope.projectSearch ||
+              fuzzysearch($scope.projectSearch, $scope.projects[i].name)) {
             projects.push($scope.projects[i]);
           }
         }
