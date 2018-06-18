@@ -44,7 +44,7 @@ type fs struct {
 
 func (me *fs) GetAttr(name string, context *fuse.Context) (*fuse.Attr, fuse.Status) {
 	switch name {
-	case "":
+	case "", ".localized", ".DS_Store":
 		return &fuse.Attr{
 			Mode: fuse.S_IFDIR | 0755,
 		}, fuse.OK
