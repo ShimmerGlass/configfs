@@ -24,7 +24,7 @@ var startCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		go func() {
 			mp, _ := cmd.Flags().GetString("mount")
-			err := fs.Run(mp, func(projectPath string) ([]byte, error) {
+			log.Fatal(fs.Run(mp, func(projectPath string) ([]byte, error) {
 				usr, err := user.Current()
 				if err != nil {
 					log.Fatal(err)
@@ -45,17 +45,10 @@ var startCmd = &cobra.Command{
 				}
 
 				return p.Contents(envs)
-			})
-			if err != nil {
-				log.Fatal(err)
-			}
+			}))
 		}()
 
 		listen, _ := cmd.Flags().GetString("listen")
-		log.Println("listening on", listen)
-		err := server.Start(listen)
-		if err != nil {
-			log.Fatal(err)
-		}
+		log.Fatal(server.Start(listen))
 	},
 }

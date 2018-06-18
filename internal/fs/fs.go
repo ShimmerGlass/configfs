@@ -1,14 +1,12 @@
 package fs
 
 import (
+	"encoding/base64"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
-
-	"github.com/pkg/errors"
-	"github.com/shirou/gopsutil/process"
 
 	"github.com/hanwen/go-fuse/fuse"
 	"github.com/hanwen/go-fuse/fuse/nodefs"
@@ -32,7 +30,6 @@ func Run(mountPoint string, cb func(path string) ([]byte, error)) error {
 		if err := server.Unmount(); err != nil {
 			log.Println(err)
 		}
-		os.Exit(0)
 	}()
 	log.Println("mounting on", mountPoint)
 	server.Serve()
@@ -52,10 +49,16 @@ func (me *fs) GetAttr(name string, context *fuse.Context) (*fuse.Attr, fuse.Stat
 			Mode: fuse.S_IFDIR | 0755,
 		}, fuse.OK
 	default:
-		contents, err := me.contents(context)
+		path, err := base64.URLEncoding.DecodeString(name)
 		if err != nil {
 			log.Println(err)
-			return nil, fuse.ENODATA
+			return nil, fuse.ENOENT
+		}
+
+		contents, err := me.cb(string(path))
+		if err != nil {
+			log.Println(err)
+			return nil, fuse.ENOENT
 		}
 
 		return &fuse.Attr{
@@ -73,40 +76,17 @@ func (fs *fs) Access(name string, mode uint32, context *fuse.Context) (code fuse
 }
 
 func (me *fs) Open(name string, flags uint32, context *fuse.Context) (file nodefs.File, code fuse.Status) {
-	contents, err := me.contents(context)
+	path, err := base64.URLEncoding.DecodeString(name)
 	if err != nil {
 		log.Println(err)
-		return nil, fuse.ENODATA
+		return nil, fuse.ENOENT
+	}
+
+	contents, err := me.cb(string(path))
+	if err != nil {
+		log.Println(err)
+		return nil, fuse.ENOENT
 	}
 
 	return nodefs.NewDataFile(contents), fuse.OK
-}
-
-func (fs *fs) contents(context *fuse.Context) ([]byte, error) {
-	path, err := fs.path(context)
-	if err != nil {
-		return nil, err
-	}
-
-	return fs.cb(path)
-}
-
-func (fs *fs) path(context *fuse.Context) (string, error) {
-	proc, err := process.NewProcess(int32(context.Pid))
-	if err != nil {
-		return "", errors.Wrap(err, "caller process open")
-	}
-
-	wd, err := proc.Cwd()
-	if err != nil {
-		return "", errors.Wrap(err, "caller process cwd")
-	}
-	ex, err := proc.Exe()
-	if err != nil {
-		return "", errors.Wrap(err, "caller process ex")
-	}
-
-	log.Println("access from", ex, "in", wd)
-
-	return wd, nil
 }
